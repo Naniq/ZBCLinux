@@ -4,7 +4,7 @@
 yum update -y
 yum upgrade -y
 #Install required packages
-yum install wget
+yum install wget -y
 
 #Install php
 yum install epel-release -y
