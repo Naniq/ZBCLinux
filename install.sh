@@ -4,7 +4,10 @@
 yum update -y
 yum upgrade -y
 #Install required packages
-yum install wget -y
+yum install wget mod_ssl -y
+
+#Update hostname
+hostnamectl set-hostname borrecloudservice.dk
 
 #Install php
 yum install epel-release -y
@@ -28,6 +31,8 @@ EOF
 
 sleep 1
 yum install MariaDB-server MariaDB-client -y
+
+#run mysql_secure_installation
 
 #update firewall
 firewall-cmd --permanent --add-service=http
@@ -55,4 +60,12 @@ wget http://www.webmin.com/jcameron-key.asc
 rpm --import jcameron-key.asc
 yum install webmin -y
 
-#install openssl
+#create certifate
+mkdir /etc/ssl/private
+chmod 700 /etc/ssl/private
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/borrecloudservice.key -out /etc/ssl/certs/borrecloudservice.crt -subj "/C=DK/ST=Ringsted/L=Ringsted/O=Borre Cloud Service/OU=IT Department/CN=borrecloudservice.dk"
+
+#update ssl information
+
+#Install Wordpress
+
