@@ -53,6 +53,6 @@ EOF
 wget http://www.webmin.com/jcameron-key.asc
 
 rpm --import jcameron-key.asc
-yum install webmin
+yum install webmin -y
 
 #install openssl
