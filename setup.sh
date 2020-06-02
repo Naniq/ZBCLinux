@@ -33,8 +33,19 @@ EOF
 
 sleep 1
 yum install MariaDB-server MariaDB-client -y
+# Start and enable mariadb
+systemctl start mariadb
+systemctl enable mariadb
 
-#run mysql_secure_installation
+#Run mysql_secure_installation
+mysql_secure_installation <<"EOF"
+
+n
+y
+n
+y
+y
+EOF
 
 #update firewall
 firewall-cmd --permanent --add-service=http
