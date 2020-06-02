@@ -41,14 +41,16 @@ chmod 700 /etc/ssl/private
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/borrecloudservice.key -out /etc/ssl/certs/borrecloudservice.crt -subj "/C=DK/ST=Ringsted/L=Ringsted/O=Borre Cloud Service/OU=IT Department/CN=borrecloudservice.dk"
 
 #update ssl information
-mv /ZBCLinux/ssl.conf /etc/httpd/conf.d/
+cp ~/ZBCLinux/ssl.conf /etc/httpd/conf.d/
+chcon system_u:object_r:httpd_config_t:s0 /etc/httpd/conf.d/ssl.conf
 
 #Install Wordpress
 wget http://wordpress.org/latest.tar.gz
 tar -xzvf latest.tar.gz
 rsync -avP ~/wordpress/ /var/www/html/
 mkdir /var/www/html/wp-content/uploads
-mv ~/ZBCLinux/wp-config.php /var/www/html/
+cp ~/ZBCLinux/wp-config.php /var/www/html/
+chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/wp-config.php
 chown -R apache:apache /var/www/html/*
 
 #Statisk IP konfigureres
