@@ -6,10 +6,12 @@ yum upgrade -y
 #Install required packages
 yum install wget mod_ssl -y
 
-#Update hostname
-hostnamectl set-hostname borrecloudservice.dk
+#Install webmin / Virtualmin + LAMP
+wget http://software.virtualmin.com/gpl/scripts/install.sh
+chmod +x install.sh
+./install --hostname borrecloudservice.com --force
 
-#Install php
+#update php to version 7.3
 yum install epel-release -y
 yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm -y
 yum install yum-utils -y
@@ -20,7 +22,7 @@ yum install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip ph
 systemctl enable httpd
 systemctl start httpd
 
-#Install mariaDB
+#Update mariaDB to version 10.2
 cat > /etc/yum.repos.d/MariaDB.repo <<"EOF"
 [mariadb]
 name = MariaDB
@@ -48,18 +50,18 @@ systemctl enable named
 systemctl start named
 
 #install webmin
-cat > /etc/yum.repos.d/webmin.repo <<"EOF"
-[Webmin]
-name=Webmin Distribution Neutral
-#baseurl=http://download.webmin.com/download/yum
-mirrorlist=http://download.webmin.com/download/yum/mirrorlist
-enabled=1
-EOF
+#cat > /etc/yum.repos.d/webmin.repo <<"EOF"
+#[Webmin]
+#name=Webmin Distribution Neutral
+##baseurl=http://download.webmin.com/download/yum
+#mirrorlist=http://download.webmin.com/download/yum/mirrorlist
+#enabled=1
+#EOF
 
-wget http://www.webmin.com/jcameron-key.asc
+#wget http://www.webmin.com/jcameron-key.asc
 
-rpm --import jcameron-key.asc
-yum install webmin -y
+#rpm --import jcameron-key.asc
+#yum install webmin -y
 
 #create certifate
 mkdir /etc/ssl/private
@@ -67,6 +69,7 @@ chmod 700 /etc/ssl/private
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/borrecloudservice.key -out /etc/ssl/certs/borrecloudservice.crt -subj "/C=DK/ST=Ringsted/L=Ringsted/O=Borre Cloud Service/OU=IT Department/CN=borrecloudservice.dk"
 
 #update ssl information
+mv /ZBCLinux/ssl.conf /etc/httpd/conf.d/
 
 #Install Wordpress
 
