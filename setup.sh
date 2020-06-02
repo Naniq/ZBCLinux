@@ -4,7 +4,7 @@
 yum update -y
 yum upgrade -y
 #Install required packages
-yum install wget mod_ssl -y
+yum install wget nano mod_ssl -y
 
 #Install webmin / Virtualmin + LAMP
 wget http://software.virtualmin.com/gpl/scripts/install.sh
