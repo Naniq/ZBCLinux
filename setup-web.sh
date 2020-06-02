@@ -54,10 +54,10 @@ chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/wp-config.php
 chown -R apache:apache /var/www/html/*
 
 #Statisk IP konfigureres
-
-
-#Adgang til standart site på port 80
-
-#Adgang til standart site på port 443
+sed 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 
 #Mail server installeres (Squirl mail eller Postgre)
+
