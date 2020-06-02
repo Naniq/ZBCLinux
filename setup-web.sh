@@ -48,7 +48,7 @@ wget http://wordpress.org/latest.tar.gz
 tar -xzvf latest.tar.gz
 rsync -avP ~/wordpress/ /var/www/html/
 mkdir /var/www/html/wp-content/uploads
-mv /ZBCLinux/wp-config.php /var/www/html/
+mv ~/ZBCLinux/wp-config.php /var/www/html/
 chown -R apache:apache /var/www/html/*
 
 #Statisk IP konfigureres
