@@ -18,6 +18,11 @@ yum install yum-utils -y
 yum-config-manager --enable remi-php73
 yum install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-pear -y
 
+#install bind
+yum install bind bind-utils -y
+systemctl enable named
+systemctl start named
+
 #Enable apache
 systemctl enable httpd
 systemctl start httpd
@@ -29,11 +34,6 @@ firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --permanent --add-port=443/tcp
 firewall-cmd --permanent --add-port=10000/tcp
 firewall-cmd --reload
-
-#install bind
-yum install bind bind-utils -y
-systemctl enable named
-systemctl start named
 
 #create certifate
 mkdir /etc/ssl/private
