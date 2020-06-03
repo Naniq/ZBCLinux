@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Set hostname
+hostnamectl set-hostname database.borrecloudservice.dk
 #Update kernal
 yum update -y
 yum upgrade -y

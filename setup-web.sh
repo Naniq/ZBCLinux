@@ -1,4 +1,5 @@
 #!/bin/bash
+#Set hostname
 
 #Update kernal
 yum update -y
