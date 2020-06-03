@@ -56,19 +56,19 @@ chown -R apache:apache /var/www/html/*
 
 #Statisk IP konfigureres
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-enp0s3
-echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+echo 'IPADDR=10.100.32.175' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+echo 'GATEWAY=10.100.32.1' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
 
 #Setup postfix
-echo '192.168.1.2 mail.borrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
+echo '10.100.32.175 mail.borrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
 sed -i 's/#myhostname = host.domain.tld/myhostname = mail.borrecloudservice.dk/g' /etc/postfix/main.cf
 sed -i 's/#mydomain = domain.tld/mydomain = borrecloudservice.dk/g' /etc/postfix/main.cf
 sed -i 's/#myorigin = $mydomain/myorigin = $mydomain/g' /etc/postfix/main.cf
 sed -i 's/#inet_interfaces = all/inet_interfaces = all/g' /etc/postfix/main.cf
 sed -i 's/inet_interfaces = localhost/#inet_interfaces = localhost/g' /etc/postfix/main.cf
 sed -i 's/mydestination = $myhostname, localhost.$mydomain, localhost/mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain/g' /etc/postfix/main.cf
-sed -i 's/#mynetworks = 168.100.189.0\/28, 127.0.0.0\/8/mynetworks = 192.168.1.0\/24, 127.0.0.0\/8/g' /etc/postfix/main.cf
+sed -i 's/#mynetworks = 168.100.189.0\/28, 127.0.0.0\/8/mynetworks = 10.100.32.0\/24, 127.0.0.0\/8/g' /etc/postfix/main.cf
 sed -i 's/#home_mailbox = Maildir/home_mailbox = Maildir/g' /etc/postfix/main.cf
 
 systemctl enable postfix
