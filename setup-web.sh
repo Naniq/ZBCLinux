@@ -1,5 +1,5 @@
 #!/bin/bash
-#Set hostname
+
 
 #Update kernal
 yum update -y
@@ -69,7 +69,7 @@ sed -i 's/#inet_interfaces = all/inet_interfaces = all/g' /etc/postfix/main.cf
 sed -i 's/inet_interfaces = localhost/#inet_interfaces = localhost/g' /etc/postfix/main.cf
 sed -i 's/mydestination = $myhostname, localhost.$mydomain, localhost/mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain/g' /etc/postfix/main.cf
 sed -i 's/#mynetworks = 168.100.189.0\/28, 127.0.0.0\/8/mynetworks = 192.168.1.0\/24, 127.0.0.0\/8/g' /etc/postfix/main.cf
-sed -i 's/#home_mailbox = Maildir/home_mailbox = maildir/g' /etc/postfix/main.cf
+sed -i 's/#home_mailbox = Maildir/home_mailbox = Maildir/g' /etc/postfix/main.cf
 
 systemctl enable postfix
 systemctl start postfix
