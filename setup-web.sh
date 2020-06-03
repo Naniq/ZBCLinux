@@ -55,10 +55,10 @@ chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/wp-config.php
 chown -R apache:apache /var/www/html/*
 
 #Statisk IP konfigureres
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-enp0s3
+echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
 
 #Setup postfix
 echo '192.168.1.2 mail.borrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
