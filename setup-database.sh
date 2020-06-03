@@ -31,8 +31,18 @@ y
 y
 EOF
 
-#Create wordpress database
-#Create user in database admin:Kode1234!
+#Create wordpress database + user
+cp ~/ZBCLinux/.my.cnf ~/
+mysql -u root
+CREATE DATABASE wordpress;
+CREATE USER admin@192.168.1.2 IDENTIFIED BY 'Kode1234!';
+GRANT ALL ON wordpress.* TO admin@192.168.1.2 IDENTIFIED BY 'Kode1234!';
+FLUSH PRIVILEGES;
+quit;
+#Change bind ip
+sed -i 's/#bind-address/bind-address/g' /etc/my.cnf.d/server.cnf
+
+systemctl restart mariadb
 
 #update firewall
 firewall-cmd --permanent --add-port=3306/tcp
@@ -40,7 +50,7 @@ firewall-cmd --permanent --add-port=3306/udp
 firewall-cmd --reload
 
 #Statisk IP konfigureres
-sed 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'IPADDR=192.168.1.3' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
