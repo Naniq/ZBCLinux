@@ -28,6 +28,10 @@ systemctl start named
 systemctl enable httpd
 systemctl start httpd
 
+#Enable remote connection for apache
+setsebool -P httpd_can_network_connect 1
+setsebool -P httpd_can_network_connect_db 1
+
 #update firewall
 firewall-cmd --permanent --add-service=http
 firewall-cmd --permanent --add-service=https
@@ -55,20 +59,20 @@ chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/wp-config.php
 chown -R apache:apache /var/www/html/*
 
 #Statisk IP konfigureres
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-enp0s3
-echo 'IPADDR=10.100.32.175' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
-echo 'GATEWAY=10.100.32.1' >> /etc/sysconfig/network-scripts/ifcfg-enp0s3
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 
 #Setup postfix
-echo '10.100.32.175 mail.borrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
+echo '192.168.1.2 mail.borrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
 sed -i 's/#myhostname = host.domain.tld/myhostname = mail.borrecloudservice.dk/g' /etc/postfix/main.cf
 sed -i 's/#mydomain = domain.tld/mydomain = borrecloudservice.dk/g' /etc/postfix/main.cf
 sed -i 's/#myorigin = $mydomain/myorigin = $mydomain/g' /etc/postfix/main.cf
 sed -i 's/#inet_interfaces = all/inet_interfaces = all/g' /etc/postfix/main.cf
 sed -i 's/inet_interfaces = localhost/#inet_interfaces = localhost/g' /etc/postfix/main.cf
 sed -i 's/mydestination = $myhostname, localhost.$mydomain, localhost/mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain/g' /etc/postfix/main.cf
-sed -i 's/#mynetworks = 168.100.189.0\/28, 127.0.0.0\/8/mynetworks = 10.100.32.0\/24, 127.0.0.0\/8/g' /etc/postfix/main.cf
+sed -i 's/#mynetworks = 168.100.189.0\/28, 127.0.0.0\/8/mynetworks = 192.168.1.0\/24, 127.0.0.0\/8/g' /etc/postfix/main.cf
 sed -i 's/#home_mailbox = Maildir/home_mailbox = Maildir/g' /etc/postfix/main.cf
 
 systemctl enable postfix
@@ -130,3 +134,4 @@ echo '<Directory /usr/share/squirrelmail>' >> /etc/httpd/conf/httpd.conf
 echo '</Directory>' >> /etc/httpd/conf/httpd.conf
 
 systemctl restart httpd
+systemctl restart network
