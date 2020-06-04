@@ -20,7 +20,7 @@
 
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'wordpress' );
+define( 'DB_NAME', 'wordpress_borrecloudservice_dk' );
 
 /** MySQL database username */
 define( 'DB_USER', 'admin' );

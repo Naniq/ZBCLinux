@@ -37,7 +37,8 @@ EOF
 cp ~/ZBCLinux/.my.cnf ~/
 mysql -u root <<"EOF"
 
-CREATE DATABASE wordpress;
+CREATE DATABASE wordpress_borrecloudservice_dk;
+CREATE DATABASE wordpress_extraborrecloudservice_dk;
 CREATE USER admin@192.168.1.2 IDENTIFIED BY 'Kode1234!';
 GRANT ALL ON wordpress.* TO admin@192.168.1.2 IDENTIFIED BY 'Kode1234!';
 FLUSH PRIVILEGES;

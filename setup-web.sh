@@ -52,11 +52,19 @@ chcon system_u:object_r:httpd_config_t:s0 /etc/httpd/conf.d/ssl.conf
 #Install Wordpress
 wget http://wordpress.org/latest.tar.gz
 tar -xzvf latest.tar.gz
-rsync -avP ~/wordpress/ /var/www/html/
-mkdir /var/www/html/wp-content/uploads
-cp ~/ZBCLinux/wp-config.php /var/www/html/
-chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/wp-config.php
-chown -R apache:apache /var/www/html/*
+
+mkdir /var/www/borrecloudservice.dk
+mkdir /var/www/extraborrecloudservice.dk
+rsync -avP ~/wordpress/ /var/www/borrecloudservice.dk
+rsync -avP ~/wordpress/ /var/www/extraborrecloudservice.dk
+mkdir /var/www/borrecloudservice/wp-content/uploads
+mkdir /var/www/extraborrecloudservice/wp-content/uploads
+cp ~/ZBCLinux/wp-config.php /var/www/borrecloudservice.dk/
+cp ~/ZBCLinux/wp-config.php /var/www/extraborrecloudservice.dk/
+chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/borrecloudservice/wp-config.php
+chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/extraborrecloudservice/wp-config.php
+sed -i 's/wordpress_borrecloudservice_dk/wordpress_extraborrecloudservice_dk/g' /var/www/extraborrecloudservice/wp-config.php
+chown -R apache:apache /var/www/*
 
 #Statisk IP konfigureres
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
@@ -64,9 +72,21 @@ echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens224
+echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-ens224
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens224
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens224
+
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens256
+echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-ens256
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens256
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens256
+
 #Setup postfix
-echo '192.168.1.2 mail.borrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
-sed -i 's/#myhostname = host.domain.tld/myhostname = mail.borrecloudservice.dk/g' /etc/postfix/main.cf
+echo '192.168.1.2 borrecloudservice' >> /etc/hosts
+echo '192.168.1.5 borrecloudservice.dk' >> /etc/hosts
+echo '192.168.1.6 extraborrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
+sed -i 's/#myhostname = host.domain.tld/myhostname = borrecloudservice/g' /etc/postfix/main.cf
 sed -i 's/#mydomain = domain.tld/mydomain = borrecloudservice.dk/g' /etc/postfix/main.cf
 sed -i 's/#myorigin = $mydomain/myorigin = $mydomain/g' /etc/postfix/main.cf
 sed -i 's/#inet_interfaces = all/inet_interfaces = all/g' /etc/postfix/main.cf
@@ -123,6 +143,40 @@ S
 Q
 EOF
 
+# Create virtual hosts
+mkdir /etc/httpd/sites-enabled
+cat > /etc/httpd/sites-enabled/borrecloudservice.dk.conf <<"EOF"
+<VirtualHost 192.168.1.5:80>
+    ServerName www.borrecloudservice.dk
+    ServerAlias borrecloudservice.dk
+    DocumentRoot /var/www/borrecloudservice.dk/
+    ErrorLog /var/www/borrecloudservice.dk/log/error.log
+    CustomLog /var/www/borrecloudservice.dk/log/requests.log combined
+</VirtualHost>
+
+<VirtualHost 192.168.1.5:443>
+    ServerName www.borrecloudservice.dk
+    ServerAlias borrecloudservice.dk
+    DocumentRoot /var/www/borrecloudservice.dk/
+    SSLEngine On
+    SSLCertificateFile /etc/ssl/certs/borrecloudservice.crt
+    SSLCertificateKeyFile /etc/ssl/private/borrecloudservice.key
+    ErrorLog /var/www/borrecloudservice.dk/log/error.log
+    CustomLog /var/www/borrecloudservice.dk/log/requests.log combined
+</VirtualHost>
+EOF
+
+cat > /etc/httpd/sites-enabled/extraborrecloudservice.dk.conf <<"EOF"
+<VirtualHost 192.168.1.6:80>
+    ServerName www.extraborrecloudservice.dk
+    ServerAlias extraborrecloudservice.dk
+    DocumentRoot /var/www/extraborrecloudservice.dk/
+    ErrorLog /var/www/extraborrecloudservice.dk/log/error.log
+    CustomLog /var/www/extraborrecloudservice.dk/log/requests.log combined
+</VirtualHost>
+EOF
+echo 'IncludeOptional sites-enabled/*.conf' >> /etc/httpd/conf/httpd.conf
+echo '' >> /etc/httpd/conf/httpd.conf
 echo 'Alias /webmail /usr/share/squirrelmail' >> /etc/httpd/conf/httpd.conf
 echo '<Directory /usr/share/squirrelmail>' >> /etc/httpd/conf/httpd.conf
  echo '  Options Indexes FollowSymLinks' >> /etc/httpd/conf/httpd.conf
@@ -133,5 +187,6 @@ echo '<Directory /usr/share/squirrelmail>' >> /etc/httpd/conf/httpd.conf
  echo '  Allow from all' >> /etc/httpd/conf/httpd.conf
 echo '</Directory>' >> /etc/httpd/conf/httpd.conf
 
+setsebool -P httpd_unified 1
 systemctl restart httpd
 systemctl restart network
