@@ -10,7 +10,9 @@ yum install wget nano mod_ssl -y
 #Install webmin / Virtualmin + LAMP
 wget http://software.virtualmin.com/gpl/scripts/install.sh
 chmod +x install.sh
-./install --hostname borrecloudservice.dk --force
+./install --hostname borrecloudservice.dk --force <<"EOF"
+ens192
+EOF
 
 #update php to version 7.3
 yum install epel-release -y
@@ -18,11 +20,6 @@ yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm -y
 yum install yum-utils -y
 yum-config-manager --enable remi-php73
 yum install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-pear -y
-
-#install bind
-yum install bind bind-utils -y
-systemctl enable named
-systemctl start named
 
 #Enable apache
 systemctl enable httpd
@@ -35,9 +32,12 @@ setsebool -P httpd_can_network_connect_db 1
 #update firewall
 firewall-cmd --permanent --add-service=http
 firewall-cmd --permanent --add-service=https
+firewall-cmd --permanent --add-service=dns
 firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --permanent --add-port=443/tcp
 firewall-cmd --permanent --add-port=10000/tcp
+firewall-cmd --permanent --add-port=53/tcp
+firewall-cmd --permanent --add-port=53/tcp
 firewall-cmd --reload
 
 #create certifate
@@ -66,17 +66,19 @@ chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/extraborrecloudservi
 sed -i 's/wordpress_borrecloudservice_dk/wordpress_extraborrecloudservice_dk/g' /var/www/extraborrecloudservice/wp-config.php
 chown -R apache:apache /var/www/*
 
-#Statisk IP konfigureres
+#Statisk IP konfigureres - Master server / DNS 
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 
+#Statisk IP konfigureres - Borrecloudservice.dk
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens224
 echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-ens224
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens224
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens224
 
+#Statisk IP konfigureres - extraborrecloudservice.dk
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens256
 echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-ens256
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens256
@@ -85,7 +87,7 @@ echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens256
 #Setup postfix
 echo '192.168.1.2 borrecloudservice' >> /etc/hosts
 echo '192.168.1.5 borrecloudservice.dk' >> /etc/hosts
-echo '192.168.1.6 extraborrecloudservice.dk borrecloudservice.dk' >> /etc/hosts
+echo '192.168.1.6 extraborrecloudservice.dk' >> /etc/hosts
 sed -i 's/#myhostname = host.domain.tld/myhostname = borrecloudservice/g' /etc/postfix/main.cf
 sed -i 's/#mydomain = domain.tld/mydomain = borrecloudservice.dk/g' /etc/postfix/main.cf
 sed -i 's/#myorigin = $mydomain/myorigin = $mydomain/g' /etc/postfix/main.cf
@@ -186,6 +188,44 @@ echo '<Directory /usr/share/squirrelmail>' >> /etc/httpd/conf/httpd.conf
  echo '  Order allow,deny' >> /etc/httpd/conf/httpd.conf
  echo '  Allow from all' >> /etc/httpd/conf/httpd.conf
 echo '</Directory>' >> /etc/httpd/conf/httpd.conf
+
+#install bind
+yum install bind bind-utils -y
+
+#Create DNS
+sed -i '13d' /etc/named.conf
+echo 'include "/etc/named/named.conf.local"' >> /etc/named.conf
+cat > /etc/named/named.conf.local <<"EOF"
+zone "borrecloudservice.dk" {
+    type master;
+    file "/etc/named/zones/db.borrecloudservice.dk"; # zone file path
+};
+EOF
+chmod 755 /etc/named
+mkdir /etc/named/zones
+
+cat > /etc/named/zones/db.borrecloudservice.dk <<"EOF"
+$TTL    604800
+@       IN      SOA     ns1.borrecloudservice.dk. admin.borrecloudservice.dk. (
+                  2020080601       ; Serial
+             604800     ; Refresh
+              86400     ; Retry
+            2419200     ; Expire
+             604800 )   ; Negative Cache TTL
+;
+; name servers - NS records
+     IN      NS      ns1.borrecloudservice.dk.
+
+; name servers - A records
+ns1.borrecloudservive.          IN      A       192.168.1.2
+
+; 10.128.0.0/16 - A records
+borrecloudservice.dk.        IN      A      192.168.1.5
+extraborrecloudservice.dk.        IN      A      192.168.1.6
+EOF
+
+systemctl enable named
+systemctl start named
 
 setsebool -P httpd_unified 1
 systemctl restart httpd
