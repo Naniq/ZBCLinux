@@ -10,7 +10,7 @@ yum install wget nano mod_ssl -y
 #Install webmin / Virtualmin + LAMP
 wget http://software.virtualmin.com/gpl/scripts/install.sh
 chmod +x install.sh
-./install --hostname borrecloudservice.dk --force <<"EOF"
+~/install.sh --hostname borrecloudservice.dk --force <<"EOF"
 ens192
 EOF
 
@@ -69,6 +69,7 @@ chown -R apache:apache /var/www/*
 
 #Statisk IP konfigureres - Master server / DNS 
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
+sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
@@ -76,6 +77,7 @@ echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
 
 #Statisk IP konfigureres - Borrecloudservice.dk
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens224
+sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-ens224
 echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-ens224
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens224
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens224
@@ -83,6 +85,7 @@ echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens224
 
 #Statisk IP konfigureres - extraborrecloudservice.dk
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens256
+sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-ens256
 echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-ens256
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens256
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens256
@@ -197,6 +200,7 @@ echo '</Directory>' >> /etc/httpd/conf/httpd.conf
 yum install bind bind-utils -y
 
 #Create DNS
+sed -i '20d' /etc/named.conf
 sed -i '13d' /etc/named.conf
 echo 'include "/etc/named/named.conf.local";' >> /etc/named.conf
 cat > /etc/named/named.conf.local <<"EOF"
