@@ -59,9 +59,9 @@ rsync -avP ~/wordpress/ /var/www/borrecloudservice.dk
 sleep 10
 rsync -avP ~/wordpress/ /var/www/extraborrecloudservice.dk
 sleep 10
-mkdir /var/www/borrecloudservice/wp-content/uploads
+mkdir /var/www/borrecloudservice.dk/wp-content/uploads
 sleep 5
-mkdir /var/www/extraborrecloudservice/wp-content/uploads
+mkdir /var/www/extraborrecloudservice.dk/wp-content/uploads
 sleep 5
 cp ~/ZBCLinux/wp-config.php /var/www/borrecloudservice.dk/
 sleep 5
