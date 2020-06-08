@@ -114,7 +114,7 @@ useradd email-user-3; echo Kode1234! | passwd email-user-3 --stdin
 useradd email-user-4; echo Kode1234! | passwd email-user-4 --stdin
 useradd email-user-5; echo Kode1234! | passwd email-user-5 --stdin
 
-#Install dovecat for Pop, imap and lmtp protcols
+#Install dovecot for Pop, imap and lmtp protcols
 yum install dovecot -y
 sed -i 's/#protocols/protocols/g' /etc/dovecot/dovecot.conf
 sed -i 's/#   mail_location = maildir/   mail_location = maildir/g' /etc/dovecot/conf.d/10-mail.conf
