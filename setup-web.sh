@@ -37,7 +37,7 @@ firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --permanent --add-port=443/tcp
 firewall-cmd --permanent --add-port=10000/tcp
 firewall-cmd --permanent --add-port=53/tcp
-firewall-cmd --permanent --add-port=53/tcp
+firewall-cmd --permanent --add-port=53/udp
 firewall-cmd --reload
 
 #create certifate
@@ -56,33 +56,39 @@ tar -xzvf latest.tar.gz
 mkdir /var/www/borrecloudservice.dk
 mkdir /var/www/extraborrecloudservice.dk
 rsync -avP ~/wordpress/ /var/www/borrecloudservice.dk
+sleep 10
 rsync -avP ~/wordpress/ /var/www/extraborrecloudservice.dk
+sleep 10
 mkdir /var/www/borrecloudservice/wp-content/uploads
+sleep 5
 mkdir /var/www/extraborrecloudservice/wp-content/uploads
+sleep 5
 cp ~/ZBCLinux/wp-config.php /var/www/borrecloudservice.dk/
+sleep 5
 cp ~/ZBCLinux/wp-config.php /var/www/extraborrecloudservice.dk/
+sleep 5
 chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/borrecloudservice/wp-config.php
 chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/extraborrecloudservice/wp-config.php
 sed -i 's/wordpress_borrecloudservice_dk/wordpress_extraborrecloudservice_dk/g' /var/www/extraborrecloudservice/wp-config.php
 chown -R apache:apache /var/www/*
 
 #Statisk IP konfigureres - Master server / DNS 
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$1
+echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-$1
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$1
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$1
 
 #Statisk IP konfigureres - Borrecloudservice.dk
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens224
-echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-ens224
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens224
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens224
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$2
+echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-$2
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$2
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$3
 
 #Statisk IP konfigureres - extraborrecloudservice.dk
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens256
-echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-ens256
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens256
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens256
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$3
+echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-$3
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$3
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$3
 
 #Setup postfix
 echo '192.168.1.2 borrecloudservice' >> /etc/hosts
@@ -194,7 +200,7 @@ yum install bind bind-utils -y
 
 #Create DNS
 sed -i '13d' /etc/named.conf
-echo 'include "/etc/named/named.conf.local"' >> /etc/named.conf
+echo 'include "/etc/named/named.conf.local";' >> /etc/named.conf
 cat > /etc/named/named.conf.local <<"EOF"
 zone "borrecloudservice.dk" {
     type master;
@@ -217,7 +223,7 @@ $TTL    604800
      IN      NS      ns1.borrecloudservice.dk.
 
 ; name servers - A records
-ns1.borrecloudservive.          IN      A       192.168.1.2
+ns1.borrecloudservice.dk.          IN      A       192.168.1.2
 
 ; 10.128.0.0/16 - A records
 borrecloudservice.dk.        IN      A      192.168.1.5
