@@ -8,11 +8,11 @@ yum upgrade -y
 yum install wget nano mod_ssl -y
 
 #Install webmin / Virtualmin + LAMP
-wget http://software.virtualmin.com/gpl/scripts/install.sh
-chmod +x install.sh
-~/install.sh --hostname borrecloudservice.dk --force <<"EOF"
-ens192
-EOF
+#wget http://software.virtualmin.com/gpl/scripts/install.sh
+#chmod +x install.sh
+#~/install.sh --hostname borrecloudservice.dk --force <<"EOF"
+#ens192
+#EOF
 
 #update php to version 7.3
 yum install epel-release -y
