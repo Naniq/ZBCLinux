@@ -55,9 +55,10 @@ firewall-cmd --permanent --add-port=3306/udp
 firewall-cmd --reload
 
 #Statisk IP konfigureres
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'IPADDR=192.168.1.3' >> /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$1
+echo 'IPADDR=192.168.1.3' >> /etc/sysconfig/network-scripts/ifcfg-$1
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$1
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$1
+/etc/sysconfig/network-scripts/ifcfg-up $1
 
 systemctl restart httpd

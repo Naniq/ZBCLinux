@@ -46,11 +46,8 @@ chmod 700 /etc/ssl/private
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/borrecloudservice.key -out /etc/ssl/certs/borrecloudservice.crt -subj "/C=DK/ST=Ringsted/L=Ringsted/O=Borre Cloud Service/OU=IT Department/CN=borrecloudservice.dk"
 
 #update ssl information
-sleep 5
 cp ~/ZBCLinux/ssl.conf /etc/httpd/conf.d/
-sleep 5
 chcon system_u:object_r:httpd_config_t:s0 /etc/httpd/conf.d/ssl.conf
-sleep 5
 #Install Wordpress
 wget http://wordpress.org/latest.tar.gz
 tar -xzvf latest.tar.gz
@@ -61,6 +58,8 @@ rsync -avP ~/wordpress/ /var/www/borrecloudservice.dk
 rsync -avP ~/wordpress/ /var/www/extraborrecloudservice.dk
 mkdir /var/www/borrecloudservice.dk/wp-content/uploads
 mkdir /var/www/extraborrecloudservice.dk/wp-content/uploads
+mkdir /var/www/borrecloudservice.dk/log
+mkdir /var/www/extraborrecloudservice.dk/log
 cp ~/ZBCLinux/wp-config.php /var/www/borrecloudservice.dk/
 cp ~/ZBCLinux/wp-config.php /var/www/extraborrecloudservice.dk/
 chcon unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/borrecloudservice.dk/wp-config.php
@@ -73,18 +72,21 @@ sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$1
 echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-$1
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$1
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$1
+/etc/sysconfig/network-scripts/ifcfg-up $1
 
 #Statisk IP konfigureres - Borrecloudservice.dk
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$2
 echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-$2
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$2
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$3
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$2
+/etc/sysconfig/network-scripts/ifcfg-up $2
 
 #Statisk IP konfigureres - extraborrecloudservice.dk
 sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$3
 echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-$3
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$3
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$3
+/etc/sysconfig/network-scripts/ifcfg-up $3
 
 #Setup postfix
 echo '192.168.1.2 borrecloudservice' >> /etc/hosts
@@ -202,6 +204,11 @@ zone "borrecloudservice.dk" {
     type master;
     file "/etc/named/zones/db.borrecloudservice.dk"; # zone file path
 };
+
+zone "extraborrecloudservice.dk" {
+    type master;
+    file "/etc/named/zones/db.extraborrecloudservice.dk"; # zone file path
+};
 EOF
 chmod 755 /etc/named
 mkdir /etc/named/zones
@@ -223,7 +230,28 @@ ns1.borrecloudservice.dk.          IN      A       192.168.1.2
 
 ; 10.128.0.0/16 - A records
 borrecloudservice.dk.        IN      A      192.168.1.5
+www.borrecloudservice.dk.   IN  A   192.168.1.5
+
+EOF
+
+cat > /etc/named/zones/db.extraborrecloudservice.dk <<"EOF"
+$TTL    604800
+@       IN      SOA     ns1.extraborrecloudservice.dk. admin.extraborrecloudservice.dk. (
+                  2020080601       ; Serial
+             604800     ; Refresh
+              86400     ; Retry
+            2419200     ; Expire
+             604800 )   ; Negative Cache TTL
+;
+; name servers - NS records
+     IN      NS      ns1.extraborrecloudservice.dk.
+
+; name servers - A records
+ns1.extraborrecloudservice.dk.          IN      A       192.168.1.2
+
+; 10.128.0.0/16 - A records
 extraborrecloudservice.dk.        IN      A      192.168.1.6
+www.extraborrecloudservice.dk.        IN      A      192.168.1.6
 EOF
 
 systemctl enable named
