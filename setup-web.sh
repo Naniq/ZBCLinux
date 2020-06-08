@@ -7,12 +7,6 @@ yum upgrade -y
 #Install required packages
 yum install wget nano mod_ssl -y
 
-#Install webmin / Virtualmin + LAMP
-wget http://software.virtualmin.com/gpl/scripts/install.sh
-chmod +x install.sh
-~/install.sh --hostname borrecloudservice.dk --force <<"EOF"
-ens192
-EOF
 
 #update php to version 7.3
 yum install epel-release -y
@@ -20,6 +14,13 @@ yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm -y
 yum install yum-utils -y
 yum-config-manager --enable remi-php73
 yum install php php-mcrypt php-cli php-gd php-curl php-mysql php-ldap php-zip php-fileinfo php-pear -y
+
+#Install webmin / Virtualmin + LAMP
+wget http://software.virtualmin.com/gpl/scripts/install.sh
+chmod +x install.sh
+~/install.sh --hostname borrecloudservice.dk --force <<"EOF"
+ens192
+EOF
 
 #Enable apache
 systemctl enable httpd
@@ -90,6 +91,9 @@ echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-ens256
 echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens256
 echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens256
 /etc/sysconfig/network-scripts/ifup-eth ens256
+
+#Use google DNS as standard search
+echo 'nameserver 8.8.8.8' >> /etc/resolv.conf
 
 #Setup postfix
 echo '192.168.1.2 borrecloudservice' >> /etc/hosts
