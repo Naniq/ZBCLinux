@@ -68,25 +68,25 @@ sed -i 's/wordpress_borrecloudservice_dk/wordpress_extraborrecloudservice_dk/g' 
 chown -R apache:apache /var/www/*
 
 #Statisk IP konfigureres - Master server / DNS 
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$1
-echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-$1
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$1
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$1
-/etc/sysconfig/network-scripts/ifcfg-up $1
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'IPADDR=192.168.1.2' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens192
+/etc/sysconfig/network-scripts/ifcfg-up ens192
 
 #Statisk IP konfigureres - Borrecloudservice.dk
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$2
-echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-$2
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$2
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$2
-/etc/sysconfig/network-scripts/ifcfg-up $2
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens224
+echo 'IPADDR=192.168.1.5' >> /etc/sysconfig/network-scripts/ifcfg-ens224
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens224
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens224
+/etc/sysconfig/network-scripts/ifcfg-up ens224
 
 #Statisk IP konfigureres - extraborrecloudservice.dk
-sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-$3
-echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-$3
-echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-$3
-echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-$3
-/etc/sysconfig/network-scripts/ifcfg-up $3
+sed -i 's/dhcp/static/g' /etc/sysconfig/network-scripts/ifcfg-ens256
+echo 'IPADDR=192.168.1.6' >> /etc/sysconfig/network-scripts/ifcfg-ens256
+echo 'NETMASK=255.255.255.0' >> /etc/sysconfig/network-scripts/ifcfg-ens256
+echo 'GATEWAY=192.168.1.1' >> /etc/sysconfig/network-scripts/ifcfg-ens256
+/etc/sysconfig/network-scripts/ifcfg-up ens256
 
 #Setup postfix
 echo '192.168.1.2 borrecloudservice' >> /etc/hosts
