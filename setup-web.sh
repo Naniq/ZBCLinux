@@ -236,7 +236,7 @@ $TTL    604800
 ; name servers - A records
 ns1.borrecloudservice.dk.          IN      A       192.168.1.2
 
-; 10.128.0.0/16 - A records
+; 192.168.1.0/24 - A records
 borrecloudservice.dk.        IN      A      192.168.1.5
 www.borrecloudservice.dk.   IN  A   192.168.1.5
 
@@ -257,7 +257,7 @@ $TTL    604800
 ; name servers - A records
 ns1.extraborrecloudservice.dk.          IN      A       192.168.1.2
 
-; 10.128.0.0/16 - A records
+; 192.168.1.0/24 - A records
 extraborrecloudservice.dk.        IN      A      192.168.1.6
 www.extraborrecloudservice.dk.        IN      A      192.168.1.6
 EOF
