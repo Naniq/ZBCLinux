@@ -188,6 +188,7 @@ cat > /etc/httpd/sites-enabled/extraborrecloudservice.dk.conf <<"EOF"
     CustomLog /var/www/extraborrecloudservice.dk/log/requests.log combined
 </VirtualHost>
 EOF
+#Include sites and add /webmail
 echo 'IncludeOptional sites-enabled/*.conf' >> /etc/httpd/conf/httpd.conf
 echo '' >> /etc/httpd/conf/httpd.conf
 echo 'Alias /webmail /usr/share/squirrelmail' >> /etc/httpd/conf/httpd.conf
@@ -265,6 +266,7 @@ EOF
 systemctl enable named
 systemctl start named
 
+#Set SElinux to unifi apache permissions
 setsebool -P httpd_unified 1
 systemctl restart httpd
 systemctl restart network

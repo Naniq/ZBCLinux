@@ -33,8 +33,10 @@ y
 y
 EOF
 
-#Create wordpress database + user
+#Create hidden credential files for mysql (Will allow user to login without using passsword mysql -u root)
 cp ~/ZBCLinux/.my.cnf ~/
+
+#Create wordpress database + user
 mysql -u root <<"EOF"
 
 CREATE DATABASE wordpress_borrecloudservice_dk;
