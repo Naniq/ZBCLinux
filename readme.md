@@ -1,1 +1,8 @@
 ![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/Domain1.png)
+![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/Domain2.png)
+![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/PFsense1.png)
+![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/PFsense2.png)
+![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/PFsense3.png)
+![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/PFsense4.png)
+![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/Webmin.png)
+![alt text](https://github.com/Naniq/ZBCLinux/blob/master/Pictures/Mail.png)
